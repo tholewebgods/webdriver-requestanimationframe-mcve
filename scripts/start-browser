@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+CHROME_VER="106.0"
+IMAGE_NAME="selenium/standalone-chrome:${CHROME_VER}-chromedriver-${CHROME_VER}"
+
+CONTAINER_NAME_BROWSER="selenium-node"
+
+function main() {
+	local container_dir="$( dirname ${0} )"
+
+	# --add-host for the hostname was necessary because Selenium tries to
+	# resolve it and fails
+	podman run \
+		--shm-size="2g" \
+	    --name "${CONTAINER_NAME_BROWSER}" \
+		--add-host "$( hostname ):127.0.0.1" \
+		--net host \
+		--rm \
+		-it \
+		-v "$(pwd)/src/main/fixture/mcve-requestanimationframe.html":"/tmp/mcve-requestanimationframe.html" \
+		-e SE_SCREEN_WIDTH=1600 \
+		-e SE_SCREEN_HEIGHT=900 \
+		-e SE_NODE_MAX_SESSIONS=5 \
+			${IMAGE_NAME}
+}
+
+main "${@}"
